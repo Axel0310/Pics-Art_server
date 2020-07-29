@@ -2,45 +2,54 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
+const fileUploader = require("../config/cloudinary");
 
 const salt = 10;
 
 router.post("/signin", (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email }).then((userDocument) => {
-    if (!userDocument) {
+  User.findOne({ email }).then((fetchedUser) => {
+    if (!fetchedUser) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    const isValidPassword = bcrypt.compareSync(password, userDocument.password);
+    const isValidPassword = bcrypt.compareSync(password, fetchedUser.password);
     if (!isValidPassword) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
-    const userObj = userDocument.toObject();
+    const userObj = fetchedUser.toObject();
     delete userObj.password;
     req.session.currentUser = userObj;
     res.status(200).json(userObj);
   });
 });
 
-router.post("/signup", (req, res, next) => {
-  const { email, password, firstName, lastName } = req.body;
+router.post(
+  "/signup",
+  fileUploader.single("profilePicture"),
+  (req, res, next) => {
+    const { email, password, name, description } = req.body;
 
-  User.findOne({ email }).then((userDocument) => {
-    if (userDocument) {
-      return res.status(400).json({ message: "Email already taken" });
-    }
+    User.findOne({ email })
+      .then((fetchedUser) => {
+        if (fetchedUser) {
+          return res.status(400).json({ message: "Email already taken" });
+        }
 
-    const hashedPassword = bcrypt.hashSync(password, salt);
-    const newUser = { email, lastName, firstName, password: hashedPassword };
+        const hashedPassword = bcrypt.hashSync(password, salt);
+        const newUser = { email, name, password: hashedPassword, description };
 
-    User.create(newUser).then((newUserDocument) => {
-      const userObj = newUserDocument.toObject();
-      delete userObj.password;
-      req.session.currentUser = userObj;
-      res.status(201).json(userObj);
-    });
-  });
-});
+        if (req.file) newUser.profilePricture = req.file.path;
+
+        User.create(newUser).then((createdUser) => {
+          const userObj = createdUser.toObject();
+          delete userObj.password;
+          req.session.currentUser = userObj;
+          res.status(201).json(userObj);
+        });
+      })
+      .catch(next);
+  }
+);
 
 router.get("/isLoggedIn", (req, res, next) => {
   if (req.session.currentUser) {

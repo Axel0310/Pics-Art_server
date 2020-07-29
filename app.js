@@ -40,11 +40,8 @@ app.use(function (req, res, next) {
  * Routes
  */
 
-const indexRouter = require("./routes/index");
-const authRouter = require("./routes/auth");
-
-app.use("/", indexRouter);
-app.use("/api/auth", authRouter);
+app.use("/api/auth", require("./routes/auth"));
+app.use("/images", require("./routes/images"));
 
 // 404 Middleware
 app.use((req, res, next) => {
