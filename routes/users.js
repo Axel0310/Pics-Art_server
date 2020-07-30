@@ -15,10 +15,10 @@ router.get("/:id", async (req, res, next) => {
 });
 
 //Search users based on name
-router.get("/:search", async (req, res, next) => {
+router.get("/search/:query", async (req, res, next) => {
   try {
     const fetchedUser = await User.find({
-      name: { $regex: req.params.search, $options: "i" },
+      name: { $regex: req.params.query, $options: "i" },
     });
     res.status(200).json(fetchedUser);
   } catch (error) {

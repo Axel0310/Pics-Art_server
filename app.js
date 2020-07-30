@@ -14,8 +14,6 @@ const cors = require("cors");
 /**
  * Middlewares
  */
-const corsOptions = { origin: process.env.FRONTEND_URL, credentials: true };
-app.use(cors(corsOptions));
 app.use(logger("dev")); // This logs HTTP reponses in the console.
 app.use(express.json()); // Access data sent as json @req.body
 app.use(express.urlencoded({ extended: false }));
@@ -29,6 +27,8 @@ app.use(
     saveUninitialized: true,
   })
 );
+const corsOptions = { origin: process.env.FRONTEND_URL, credentials: true };
+app.use(cors(corsOptions));
 
 // Test to see if user is logged In before getting into any router.
 app.use(function (req, res, next) {
@@ -42,6 +42,8 @@ app.use(function (req, res, next) {
 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/images", require("./routes/images"));
+app.use("/users", require("./routes/users"));
+app.use("/tags", require("./routes/tags"));
 
 // 404 Middleware
 app.use((req, res, next) => {

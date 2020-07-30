@@ -17,6 +17,10 @@ const imageSchema = new Schema({
   },
   comments: [
     {
+      commentId: {
+        type: Schema.Types.ObjectId,
+        default: new mongoose.Types.ObjectId(),
+      },
       userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
@@ -32,6 +36,6 @@ const imageSchema = new Schema({
   ],
 });
 
-const Image = mongoose.model("User", imageSchema);
+const Image = mongoose.model("Image", imageSchema);
 
 module.exports = Image;
