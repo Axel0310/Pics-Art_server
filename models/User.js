@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  email: { type: String, required: true, unique: true},
+  email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   name: { type: String, required: true },
   profilePicture: {
@@ -10,6 +10,12 @@ const userSchema = new Schema({
     default:
       "https://res.cloudinary.com/direuudpy/image/upload/v1596033402/insta/profile_picture_default_tzqyoh.jpg",
   },
+  images: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Image",
+    },
+  ],
   followers: [
     {
       type: Schema.Types.ObjectId,

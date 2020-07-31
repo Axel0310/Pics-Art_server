@@ -11,7 +11,11 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "user-pictures",
+    folder: "insta",
+    transformation: {
+      widht: 375,
+      height: 375,
+    }
   },
 });
 

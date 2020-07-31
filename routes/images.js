@@ -7,8 +7,8 @@ const fileUploader = require("../config/cloudinary");
 // Get one image based on its ID
 router.get("/:id", async (req, res, next) => {
   try {
-    const fetchedImages = await Image.findById(req.params.id);
-    res.status(200).json(fetchedImages);
+    const fetchedImage = await Image.findById(req.params.id);
+    res.status(200).json(fetchedImage);
   } catch (error) {
     next(error);
   }
@@ -17,7 +17,7 @@ router.get("/:id", async (req, res, next) => {
 // Get all images
 router.get("/", async (req, res, next) => {
   try {
-    const fetchedImages = await Image.find();
+    const fetchedImages = await Image.find().populate("creator");
     res.status(200).json(fetchedImages);
   } catch (error) {
     next(error);
@@ -33,8 +33,8 @@ router.get("/", async (req, res, next) => {
 //     }
 //   });
 
-// Add a new image
-router.post("/", fileUploader.single("url"), async (req, res, next) => {
+// Upload a new image
+router.post("/", fileUploader.single("image"), async (req, res, next) => {
   const newImage = { ...req.body };
   const userId = req.session.currentUser._id;
   newImage.url = req.file.path;
