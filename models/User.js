@@ -10,6 +10,7 @@ const userSchema = new Schema({
     default:
       "https://res.cloudinary.com/direuudpy/image/upload/v1596033402/insta/profile_picture_default_tzqyoh.jpg",
   },
+  description: String,
   images: [
     {
       type: Schema.Types.ObjectId,

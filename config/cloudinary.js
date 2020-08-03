@@ -15,9 +15,14 @@ const storage = new CloudinaryStorage({
     transformation: {
       widht: 375,
       height: 375,
+      // crop: "scale"
     }
+    // crop: "imagga_scale", 
+    // width: 375, 
+    // height: 375,
+    // signed_url: true
   },
 });
 
-const fileUploader = multer({ storage }); 
+const fileUploader = multer({ storage });
 module.exports = fileUploader;
