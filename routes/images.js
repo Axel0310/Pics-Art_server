@@ -10,7 +10,7 @@ router.get("/:id", async (req, res, next) => {
     const fetchedImage = await Image.findById(req.params.id);
     res.status(200).json(fetchedImage);
   } catch (error) {
-    next(error);
+    res.status(500).json(error)
   }
 });
 
@@ -20,18 +20,9 @@ router.get("/", async (req, res, next) => {
     const fetchedImages = await Image.find().populate("creator");
     res.status(200).json(fetchedImages);
   } catch (error) {
-    next(error);
+    res.status(500).json(error)
   }
 });
-
-// Get the 5 latest image uploaded
-// router.get("/new", async (req, res, next) => {
-//     try {
-
-//     } catch (error) {
-//       next(error);
-//     }
-//   });
 
 // Upload a new image
 router.post("/", fileUploader.single("image"), async (req, res, next) => {
@@ -48,7 +39,7 @@ router.post("/", fileUploader.single("image"), async (req, res, next) => {
     await User.findByIdAndUpdate(userId, user);
     res.status(201).json(createdImage);
   } catch (error) {
-    next(error);
+    res.status(500).json(error)
   }
 });
 
@@ -58,11 +49,12 @@ router.patch("/:id", async (req, res, next) => {
   try {
     const updatedImage = await Image.findByIdAndUpdate(
       req.params.id,
-      updatedInfo
+      updatedInfo,
+      {new: true}
     );
     res.status(200).json(updatedImage);
   } catch (error) {
-    next(error);
+    res.status(500).json(error)
   }
 });
 
@@ -72,13 +64,24 @@ router.delete("/:id", async (req, res, next) => {
   const imageId = req.params.id;
   try {
     const user = await User.findById(userId);
-    user.images.filter((id) => id !== imageId);
-    await User.findByIdAndUpdate({ images: user.images });
+    const updatedImages = user.images.filter((id) => id != imageId);
+    const updatedUser = await User.findByIdAndUpdate(userId, { images: updatedImages }, {new: true});
     await Image.findByIdAndDelete(imageId);
-    res.status(200);
+    res.status(200).json(updatedUser);
   } catch (error) {
-    next(error);
+    res.status(500).json(error)
   }
 });
 
+router.get("/profile/:id", async (req, res, next) => {
+  try {
+    const images = await Image.find({creator: req.params.id}).populate("creator");
+    res.status(200).json(images);
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
+
 module.exports = router;
+
+
