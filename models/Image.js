@@ -12,10 +12,12 @@ const imageSchema = new Schema(
       ref: "User",
     },
     description: String,
-    likes: {
-      type: Number,
-      default: 0,
-    },
+    likes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     comments: [
       {
         commentId: {

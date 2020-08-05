@@ -29,12 +29,6 @@ const userSchema = new Schema({
       ref: "User",
     },
   ],
-  likes: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Image",
-    },
-  ],
   notifications: [
     {
       userId: {
