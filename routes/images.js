@@ -17,7 +17,7 @@ router.get("/:id", async (req, res, next) => {
 // Get all images
 router.get("/", async (req, res, next) => {
   try {
-    const fetchedImages = await Image.find().populate("creator");
+    const fetchedImages = await Image.find().populate("creator").sort({createdAt: -1});
     res.status(200).json(fetchedImages);
   } catch (error) {
     res.status(500).json(error);
