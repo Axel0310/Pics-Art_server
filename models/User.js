@@ -31,7 +31,7 @@ const userSchema = new Schema({
   ],
   notifications: [
     {
-      userId: {
+      user: {
         type: Schema.Types.ObjectId,
         ref: "User",
       },
@@ -43,7 +43,11 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Image",
       },
-    },
+      createdAt: {
+        type: Date,
+        default: Date.now(),
+      }
+    }
   ],
 });
 

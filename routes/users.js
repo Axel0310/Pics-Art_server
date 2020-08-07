@@ -7,6 +7,19 @@ const bcrypt = require("bcrypt");
 
 const salt = 10;
 
+//Get all connected user's notifications
+router.get("/notifications", async (req, res, next) => {
+  try {
+    const user = await User.findById(req.session.currentUser._id)
+      .select("notifications")
+      .populate("notifications.user", "name")
+      .populate("notifications.image", "url")
+    res.status(200).json(user.notifications);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 //Get one user from its ID
 router.get("/:id", async (req, res, next) => {
   try {
@@ -40,8 +53,8 @@ router.patch(
 
     if (req.file) updatedInputs.profilePicture = req.file.path;
 
-    if(Object.keys(updatedInputs).length === 0){
-      console.log("fooo")
+    if (Object.keys(updatedInputs).length === 0) {
+      console.log("fooo");
       return res.status(200).json({ message: "No update provided" });
     }
 
@@ -60,7 +73,6 @@ router.patch(
       const hashedPassword = bcrypt.hashSync(updatedInputs.password, salt);
       updatedInputs.password = hashedPassword;
     }
-
 
     try {
       const updatedUser = await User.findByIdAndUpdate(
@@ -90,7 +102,9 @@ router.patch("/follow", async (req, res, next) => {
     let updatedFollowers = [];
 
     if (connectedUser.subscriptions.includes(profileUserId)) {
-      updatedSubs = connectedUser.subscriptions.filter((userId) => userId != profileUserId); //The user ID corresponding to the profil viewed is removed from the subscriptions of the connected user
+      updatedSubs = connectedUser.subscriptions.filter(
+        (userId) => userId != profileUserId
+      ); //The user ID corresponding to the profil viewed is removed from the subscriptions of the connected user
       updatedFollowers = profileUser.followers.filter(
         (userId) => userId != connectedUserId
       ); //The connected user ID is removed from the followers of the profile user
@@ -99,19 +113,27 @@ router.patch("/follow", async (req, res, next) => {
       updatedFollowers.push(connectedUserId); //The connected user ID is added to the followers array of the profile user
     }
 
-    let updatedConnectedUser = await User.findByIdAndUpdate(connectedUserId, {
-      subscriptions: updatedSubs,
-    }, {new: true});
-    let updatedProfileUser = await User.findByIdAndUpdate(profileUserId, {
-      followers: updatedFollowers,
-    }, {new: true});
-    
+    let updatedConnectedUser = await User.findByIdAndUpdate(
+      connectedUserId,
+      {
+        subscriptions: updatedSubs,
+      },
+      { new: true }
+    );
+    let updatedProfileUser = await User.findByIdAndUpdate(
+      profileUserId,
+      {
+        followers: updatedFollowers,
+      },
+      { new: true }
+    );
+
     updatedConnectedUser = updatedConnectedUser.toObject();
     delete updatedConnectedUser.password;
     updatedProfileUser = updatedProfileUser.toObject();
     delete updatedProfileUser.password;
 
-    res.status(200).json({updatedConnectedUser, updatedProfileUser});
+    res.status(200).json({ updatedConnectedUser, updatedProfileUser });
   } catch (error) {
     res.status(500).json(error);
   }

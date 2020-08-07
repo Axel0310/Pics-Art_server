@@ -17,7 +17,10 @@ router.get("/:id", async (req, res, next) => {
 // Get all images
 router.get("/", async (req, res, next) => {
   try {
-    const fetchedImages = await Image.find().populate("creator").sort({createdAt: -1});
+    const fetchedImages = await Image.find()
+      .populate("creator")
+      .populate("likes", "name")
+      .sort({ createdAt: -1 });
     res.status(200).json(fetchedImages);
   } catch (error) {
     res.status(500).json(error);
@@ -65,9 +68,12 @@ router.delete("/:id", async (req, res, next) => {
   try {
     const user = await User.findById(userId);
     const updatedImages = user.images.filter((id) => id != imageId);
+    const updatedNotifs = user.notifications.filter(
+      (notif) => notif.image != imageId
+    );
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { images: updatedImages },
+      { images: updatedImages, notifications: updatedNotifs },
       { new: true }
     );
     await Image.findByIdAndDelete(imageId);
@@ -80,9 +86,9 @@ router.delete("/:id", async (req, res, next) => {
 // Get all images of a user
 router.get("/profile/:id", async (req, res, next) => {
   try {
-    const images = await Image.find({ creator: req.params.id }).populate(
-      "creator"
-    );
+    const images = await Image.find({ creator: req.params.id })
+      .populate("creator")
+      .populate("likes");
     res.status(200).json(images);
   } catch (error) {
     res.status(500).json(error);
@@ -94,18 +100,33 @@ router.patch("/like/:id", async (req, res, next) => {
   const userId = req.session.currentUser._id;
   try {
     const image = await Image.findById(imgId);
+    const creator = await User.findById(image.creator);
     let updatedLikes = [];
+    let updatedNotifs = [];
     if (image.likes.includes(userId)) {
       updatedLikes = image.likes.filter((id) => id != userId);
+      updatedNotifs = creator.notifications.filter(
+        ({ user, image }) => user != userId || image != imgId
+      );
     } else {
       updatedLikes = [...image.likes];
       updatedLikes.push(userId);
+      updatedNotifs = [...creator.notifications];
+      updatedNotifs.push({ user: userId, event: "liked", image: imgId });
     }
     const updatedImage = await Image.findByIdAndUpdate(
       imgId,
       { likes: updatedLikes },
       { new: true }
-    ).populate("creator");
+    )
+      .populate("creator")
+      .populate("likes", "name");
+    const updatedUser = await User.findByIdAndUpdate(
+      creator._id,
+      { notifications: updatedNotifs },
+      { new: true }
+    );
+
     res.status(200).json(updatedImage);
   } catch (error) {
     res.status(500).json(error);
