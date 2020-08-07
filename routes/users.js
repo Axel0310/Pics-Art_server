@@ -109,6 +109,8 @@ router.patch("/follow", async (req, res, next) => {
         (userId) => userId != connectedUserId
       ); //The connected user ID is removed from the followers of the profile user
     } else {
+      updatedSubs = [...connectedUser.subscriptions];
+      updatedFollowers = [...profileUser.followers]
       updatedSubs.push(profileUserId); //The user ID corresponding to the profil viewed is added to the subscriptions of the connected user
       updatedFollowers.push(connectedUserId); //The connected user ID is added to the followers array of the profile user
     }
