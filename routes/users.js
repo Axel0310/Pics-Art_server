@@ -20,6 +20,17 @@ router.get("/notifications", async (req, res, next) => {
   }
 });
 
+//Get user friends
+router.get("/friends", async (req, res, next) => {
+  try {
+    const user = await User.findById(req.session.currentUser._id).populate("subscriptions", {"name": 1, "profilePicture": 1});
+    console.log(user.subscriptions)
+    res.status(200).json(user.subscriptions)
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 //Get one user from its ID
 router.get("/:id", async (req, res, next) => {
   try {

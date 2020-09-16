@@ -95,6 +95,7 @@ router.get("/profile/:id", async (req, res, next) => {
   }
 });
 
+//Toggle image like
 router.patch("/like/:id", async (req, res, next) => {
   const imgId = req.params.id;
   const userId = req.session.currentUser._id;
@@ -104,7 +105,7 @@ router.patch("/like/:id", async (req, res, next) => {
     let updatedLikes = [];
     let updatedNotifs = [];
     if (image.likes.includes(userId)) {
-      updatedLikes = image.likes.filter((id) => id != userId);
+      updatedLikes = image.likes.filter((id) => String(id) != String(userId));
       updatedNotifs = creator.notifications.filter(
         ({ user, image }) => user != userId || image != imgId
       );
