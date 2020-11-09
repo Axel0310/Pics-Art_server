@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
-if (!process.env.MONGODB_URI) {
+if (!process.env.DB_URI) {
   throw "Cannot read MONGODB_URI, the uri seems to be undefined, have you set the environment variables ?";
 }
 
 mongoose
-  .connect(process.env.MONGODB_URI, {
+  .connect(process.env.DB_URI, {
     useCreateIndex: true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
