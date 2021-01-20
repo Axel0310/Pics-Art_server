@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 
 const salt = 10;
 
-//Get all connected user's notifications
+//Get all connected user notifications
 router.get("/notifications", async (req, res, next) => {
   try {
     const user = await User.findById(req.session.currentUser._id)
